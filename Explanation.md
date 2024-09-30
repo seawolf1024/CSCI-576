@@ -132,10 +132,32 @@ The smooth areas of the image are removed first, while the areas with significan
 
 **Outputs:**
 
+Here I deduce the width and height of each image both by 50:
 
+![hw1_1_high_res_out](F:\USC\12-CSCI-576\code\SeamCarving\seam-carving\hw1_1_high_res_out.bmp)
+
+![hw1_2_high_res_out](F:\USC\12-CSCI-576\code\SeamCarving\seam-carving\hw1_2_high_res_out.bmp)
+
+![hw1_3_high_res_out](F:\USC\12-CSCI-576\code\SeamCarving\seam-carving\hw1_3_high_res_out.bmp)
+
+![hw1_4_high_res_out](F:\USC\12-CSCI-576\code\SeamCarving\seam-carving\hw1_4_high_res_out.bmp)
 
 #### Up sampling image quality
 
-Method: The paper uses patches from the same locations of multiple low-resolution images (with subpixel misalignment) to fit the corresponding areas in the high-resolution image.
+**Explanation:** 
+
+As from the paper, the idea is to use patches from the same locations of multiple low-resolution images (with subpixel misalignment) to fit the corresponding areas in the high-resolution image.
+
+Key idea: For each patch in the low-resolution image, use NN to find similar patches, then map the high-resolution receptive field, and establish simultaneous equations through the overlapping parts. 
+
+![image-20240930174729399](C:\Users\Administrator.DESKTOP-24B2MVU\AppData\Roaming\Typora\typora-user-images\image-20240930174729399.png)
 
 **Outputs:**
+
+![hw1_1_low_res_output](F:\USC\12-CSCI-576\code\CSCI-576\outputs\SuperResolution\hw1_1_low_res_output.bmp)
+
+![hw1_2_low_res_output](F:\USC\12-CSCI-576\code\CSCI-576\outputs\SuperResolution\hw1_2_low_res_output.bmp)
+
+![hw1_3_low_res_output](F:\USC\12-CSCI-576\code\CSCI-576\outputs\SuperResolution\hw1_3_low_res_output.bmp)
+
+![hw1_4_low_res_output](F:\USC\12-CSCI-576\code\CSCI-576\outputs\SuperResolution\hw1_4_low_res_output.bmp)
