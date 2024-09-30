@@ -15,9 +15,10 @@ java ImageDisplay ../hw1_1_high_res.rgb 4000 3000 1 O1
 java ImageDisplay ../hw1_1_high_res.rgb 4000 3000 2 O1
 java ImageDisplay ../hw1_1_low_res.rgb 400 300 3 O1
 java ImageDisplay ../hw1_1_low_res.rgb 400 300 4 O1
+java ImageDisplay ../hw1_1_high_res.rgb 4000 3000 5 O1 // Not required
 ```
 
-There are 4 methods for `[resamplingMethod]`:
+There are 5 methods for `[resamplingMethod]`:
 
 `resamplingMethod = 1`: down-sample, specific sampling 
 
@@ -27,9 +28,11 @@ There are 4 methods for `[resamplingMethod]`:
 
 `resamplingMethod = 4`: up-sample, bilinear Interpolation
 
+`resamplingMethod = 5`: down-sample,  Pixel Aspect Ratio (PAR)  // Not required
+
 #### Method 1
 
-down-sample, specific sampling 
+**down-sample, specific sampling** 
 
 This method find the pixel in the original image proportionally and fill it to the target image.
 
@@ -39,7 +42,7 @@ targetImage(x, y) =  originalImage(x * oldW / newW, y * oldH / newH)
 
 #### Method 2
 
-down-sample, average smoothing
+**down-sample, average smoothing**
 
 This method find the blocks of pixels in the original image, calculate their average value, and fill it to the target image.
 
@@ -47,7 +50,7 @@ This method find the blocks of pixels in the original image, calculate their ave
 
 #### Method 3
 
-up-sample, nearest neighbor
+**up-sample, nearest neighbor**
 
 This method find the pixel in the original image proportionally and fill it to the target image. Adjacent pixels in the target image might have the same value because they are mapped into the same pixel in the original image.
 
@@ -55,7 +58,7 @@ This method find the pixel in the original image proportionally and fill it to t
 
 #### Method 4
 
-up-sample, bilinear Interpolation
+**up-sample, bilinear Interpolation**
 
 This method do bilinear interpolation for pixels in original image to calculate the pixels in the target image. 
 
@@ -73,17 +76,66 @@ This method do bilinear interpolation for pixels in original image to calculate 
 
 #### Pixel Aspect Ratio (PAR) changes while down sampling
 
-Method: 
+**Method:** Maintain pixels at the center of the image without any stretching, and increase the stretching nonlinearly towards the  periphery.
+
+This is implemented by using a non-liner function. Here for simplicity, I choose a quadratic function which is approximately linear at the center of the image, and non-linear at the periphery. 
+
+Note that the modified image is complete (just stretched). You can see the complete information in the four corners of the image.
+
+**Outputs:**
+
+Pixel Aspect Ratio, O1:
+
+```
+java ImageDisplay ../hw1_1_high_res.rgb 4000 3000 5 O1
+```
+
+![hw1_1_high_res.rgb-4000-3000-5-O1](F:\USC\12-CSCI-576\code\CSCI-576\outputs\hw1_1_high_res.rgb-4000-3000-5-O1.jpg)
+
+
+
+Pixel Aspect Ratio, O2:
+
+```
+java ImageDisplay ../hw1_1_high_res.rgb 4000 3000 5 O2
+```
+
+![hw1_1_high_res.rgb-4000-3000-5-O2](F:\USC\12-CSCI-576\code\CSCI-576\outputs\hw1_1_high_res.rgb-4000-3000-5-O2.jpg)
+
+You can also see the original images on Github: https://github.com/seawolf1024/CSCI-576
 
 
 
 #### Seam Carving as a solution
 
-Method:
+**Comment on the results:**
+
+The smooth areas of the image are removed first, while the areas with significant abrupt changes are retained. In this way, the main object is retained, and it's with the same proportions as in the original image.
+
+**Pros:**
+
+(1) Content Preservation: Seam carving could preserve important image content. Objects of interest (e.g. people, objects) tend to remain undistorted because the algorithm removes less significant pixels.
+
+(2) Avoiding Distortion: Seam carving avoids the stretching or squashing of objects.
+
+**Cons:**
+
+(1) Performance in high-frequency Areas: See **Where it Struggles** below.
+
+(2) Time complexity: Seam carving requires generating the energy map, finding seams, and removing them. This can take a long time for large images.
+
+**Where do you think the method performs well or does not  perform well?** 
+
+**Where it Performs Well**: It performs well in images wiht large homogeneous regions (e.g. skies, fields), as it can safely remove seams in these areas without affecting the overall composition.
+
+**Where it Struggles**: The method struggles with complex or densely populated images (e.g. those with multiple people/objects, high-frequency textures). In such cases, removing seams can lead to visual distortions.
+
+**Outputs:**
 
 
 
 #### Up sampling image quality
 
-Method:
+Method: The paper uses patches from the same locations of multiple low-resolution images (with subpixel misalignment) to fit the corresponding areas in the high-resolution image.
 
+**Outputs:**

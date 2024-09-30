@@ -9,11 +9,12 @@ java ImageDisplay ../hw1_1_high_res.rgb 4000 3000 1 O1
 java ImageDisplay ../hw1_1_high_res.rgb 4000 3000 2 O1
 java ImageDisplay ../hw1_1_low_res.rgb 400 300 3 O1
 java ImageDisplay ../hw1_1_low_res.rgb 400 300 4 O1
+java ImageDisplay ../hw1_1_high_res.rgb 4000 3000 5 O1 // Not required
 ```
 
 #### Resampling Method
 
-There are 4 methods for `[resamplingMethod]`:
+There are 5 methods for `[resamplingMethod]`:
 
 `resamplingMethod = 1`: down-sample, specific sampling 
 
@@ -22,3 +23,5 @@ There are 4 methods for `[resamplingMethod]`:
 `resamplingMethod = 3`: up-sample, nearest neighbor
 
 `resamplingMethod = 4`: up-sample, bilinear Interpolation
+
+`resamplingMethod = 5`: down-sample,  Pixel Aspect Ratio (PAR)  // Not required
