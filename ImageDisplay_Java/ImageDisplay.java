@@ -79,7 +79,8 @@ public class ImageDisplay {
             case "4": // up-sample, bilinear Interpolation
                 upsampleBilinear(img, resampledImage);
                 break;
-
+			case "5": // down-sample, PAR
+				downsamplePAR(img, resampledImage);
 			default:
 				break;
 		}
@@ -195,6 +196,154 @@ public class ImageDisplay {
 
 				int newColor = (0xFF << 24) | (r << 16) | (g << 8) | b;
 				resampledImage.setRGB(x, y, newColor);
+			}
+		}
+	}
+
+	private void downsamplePAR00(BufferedImage img, BufferedImage resampledImage) {
+		int originalWidth = img.getWidth();
+		int originalHeight = img.getHeight();
+		int newWidth = resampledImage.getWidth();
+		int newHeight = resampledImage.getHeight();
+	
+		int oriCenterX = originalWidth / 2;
+		int oriCenterY = originalHeight / 2;
+		int newCenterX = newWidth / 2;
+		int newCenterY = newHeight / 2;
+
+		// function: y = 
+		// Iterate through the new image and map pixels non-linearly from the original image
+		for (int y = 0; y < newHeight; y++) {
+			for (int x = 0; x < newWidth; x++) {
+				double xNewRatio = ((double) Math.abs(x - newCenterX)) / newWidth; // [0, 1]
+				double yNewRatio = ((double)Math.abs(y - newCenterY)) / newHeight; // [0, 1]
+
+				double alpha = 0.7;
+				double xOriRatio = Math.pow(xNewRatio, alpha);
+				double yOriRatio = Math.pow(yNewRatio, alpha);
+				double xOriCenterDist = xOriRatio * originalWidth;
+				double yOriCenterDist = yOriRatio * originalHeight;
+				double srcX = x < newCenterX ? oriCenterX - xOriCenterDist : oriCenterX + xOriCenterDist;
+				double srcY = y < newCenterY ? oriCenterY - yOriCenterDist : oriCenterY + yOriCenterDist;
+				if(x % 100 == 0 && y % 100 == 0){
+					System.out.println("x = " + x + ", y = " + y +", srcX = " + srcX + ", srcY = " + srcY);
+				}
+				if(srcX < 0) srcX = 0;
+				if(srcX >= originalWidth) srcX = originalWidth - 1;
+				if(srcY < 0) srcY = 0;
+				if(srcY >= originalHeight) srcY = originalHeight - 1;
+
+				//System.out.println("x = " + x + ", y = " + y);
+				// System.out.println("srcX = " + srcX + ", srcY = " + srcY);
+				int rgb = img.getRGB((int) srcX, (int) srcY);
+				resampledImage.setRGB(x, y, rgb);
+			}
+		}
+	}
+
+	private void downsamplePAR(BufferedImage img, BufferedImage resampledImage) {
+		int oriWidth = img.getWidth();
+		int oriHeight = img.getHeight();
+		int newWidth = resampledImage.getWidth();
+		int newHeight = resampledImage.getHeight();
+	
+		int oriCenterX = oriWidth / 2;
+		int oriCenterY = oriHeight / 2;
+		int newCenterX = newWidth / 2;
+		int newCenterY = newHeight / 2;
+
+		// function: y = 
+		// Iterate through the new image and map pixels non-linearly from the original image
+		for (int y = 0; y < newHeight; y++) {
+			for (int x = 0; x < newWidth; x++) {
+				double srcX, srcY;
+				
+				double newXCenterDist = Math.abs(x - newCenterX);
+				double newYCenterDist = Math.abs(y - newCenterY);
+				// double centerDist = Math.sqrt(xCenterDist * xCenterDist + yCenterDist * yCenterDist);
+				
+				double xr = 1 / 3;
+				double yr = xr * 4 / 3; // 4 / 9
+
+				// x -> srcX
+				// newXCenterDist: (0, newWidth / 2)
+				// y = x, (0, 0), (newWidth / 2, oriWidth / 2)
+				double oriXCenterDist = newXCenterDist / newWidth * oriWidth;
+				// y -> srcY
+				// newXCenterDist: (0, newHeight / 2)
+				// y = f(x), (0, 0), (newHeight / 2 * 4 / 9, oriHeight / 2 * 1 / 3), (newHeight / 2, oriHeight / 2)
+				double m = newHeight; double n = oriHeight;
+				double a = 9.0 * n / 10 / m / m; double b = 11 * n / 20 / m;
+				// System.out.println("a = " + a + ", b = " + b);
+				double oriYCenterDist = a * newYCenterDist * newYCenterDist + b * newYCenterDist;
+				if(newYCenterDist == newHeight / 2 * 4 / 9){
+					System.out.println("newYCenterDist = " + newYCenterDist + ", oriYCenterDist = " + oriYCenterDist);
+				}
+				
+
+				// oriYCenterDist = newYCenterDist / newHeight * oriHeight;
+
+				srcX = x > newCenterX ? oriCenterX + oriXCenterDist : oriCenterX - oriXCenterDist;
+				srcY = y > newCenterY ? oriCenterY + oriYCenterDist :  oriCenterY - oriYCenterDist;
+
+				if(srcX < 0) srcX = 0;
+				if(srcX >= oriWidth) srcX = oriWidth - 1;
+				if(srcY < 0) srcY = 0;
+				if(srcY >= oriHeight) srcY = oriHeight - 1;
+
+				//System.out.println("x = " + x + ", y = " + y);
+				// System.out.println("srcX = " + srcX + ", srcY = " + srcY);
+				int rgb = img.getRGB((int) srcX, (int) srcY);
+				resampledImage.setRGB(x, y, rgb);
+			}
+		}
+	}
+	
+	private void downsamplePAR0(BufferedImage img, BufferedImage resampledImage) {
+		int oriWidth = img.getWidth();
+		int oriHeight = img.getHeight();
+		int newWidth = resampledImage.getWidth();
+		int newHeight = resampledImage.getHeight();
+	
+		int oriCenterX = oriWidth / 2;
+		int oriCenterY = oriHeight / 2;
+		int newCenterX = newWidth / 2;
+		int newCenterY = newHeight / 2;
+
+		// function: y = 
+		// Iterate through the new image and map pixels non-linearly from the original image
+		for (int y = 0; y < newHeight; y++) {
+			for (int x = 0; x < newWidth; x++) {
+				double srcX, srcY;
+				double ratio = 0.3;
+				double xCenterDisNew = x - newCenterX;
+				double yCenterDisNew = y - newCenterY;
+				if(Math.abs(xCenterDisNew / (newWidth / 2.0)) < ratio && Math.abs(yCenterDisNew / (newWidth / 2.0)) < ratio * 3 / 4){
+					srcX = oriCenterX + (double) (x - newCenterX) / newWidth * oriWidth;
+					srcY = oriCenterY + (double) (y - newCenterY) / newHeight * oriHeight * 3 / 4;
+					// System.out.println("x = " + x +", ");
+				}else{
+					double r = Math.abs(((double) x - newCenterX) / (newWidth / 2)); // r : (ratio, 1]
+					double factor = 1 - Math.pow(Math.abs(r - ratio), 1.5) * 1/10; // 1 - r: [0, 0.7)         [1 - ]
+					
+					double rY = Math.abs(((double) y - newCenterX) / (newWidth / 2)); // r : (ratio, 1]
+					double factorY = 1 - Math.pow(Math.abs(rY - ratio * 3 / 4), 1.5) * 1/2; // 1 - r: [0, 0.7)         [1 - ]
+
+					// factor = 1;
+					// factorY = 1;
+					srcX = oriCenterX + (double) (x - newCenterX) / newWidth * oriWidth  ;//* factor;
+					srcY = oriCenterY + (double) (y - newCenterY) / newHeight * oriHeight * factorY * 3 / 4;
+					if(srcX < 0) srcX = 0;
+					if(srcX >= oriWidth) srcX = oriWidth - 1;
+					if(srcY < 0) srcY = 0;
+					if(srcY >= oriHeight) srcY = oriHeight - 1;
+					// srcX = 0; srcY = 0;
+				}
+
+				//System.out.println("x = " + x + ", y = " + y);
+				// System.out.println("srcX = " + srcX + ", srcY = " + srcY);
+				int rgb = img.getRGB((int) srcX, (int) srcY);
+				resampledImage.setRGB(x, y, rgb);
 			}
 		}
 	}
